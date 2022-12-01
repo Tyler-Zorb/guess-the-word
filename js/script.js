@@ -58,5 +58,39 @@ const makeGuess = function (guess) {
     } else {
         guessedLetters.push(guess);     //this pushes the letter they've guessed to the guessedLetters array.
         console.log(guessedLetters);
+        showGuessedLetters();   //calling the function below this (after I created that function obviously) so the letter displays when it hasn't been guessed before.
+        updateWordInProgress(guessedLetters);   //calling the updateWordInProgress function I created below with guessedLetters as an argument.
+    }
+};
+
+const showGuessedLetters = function () {
+    guessedLettersElement.innerHTML = "";   //this empties the innerHTML of the unordered list where the players guessed letters will display.
+    for (const letter of guessedLetters) {  //all of this is creating a new list item for each letter inside my guessedLetters array and adding it to the unordered list.
+        const li = document.createElement("li");
+        li.innerText = letter;
+        guessedLettersElement.append(li);
+    }
+};
+
+const updateWordInProgress = function (guessedLetters) {    //this function will replace the circle symbols with the correct letters guessed.
+    const wordUpper = word.toUpperCase();
+    const wordArray = wordUpper.split("");  //this splits the word string into an array so that the letter can appear in the guessedLetters array.
+    const revealWord = [];
+    for (const letter of wordArray) {
+        if (guessedLetters.includes(letter)) {
+            revealWord.push(letter.toUpperCase());
+        } else {
+            revealWord.push("●");
+        }
+    }
+    // console.log(revealWord);
+    wordInProgress.innerText = revealWord.join("");
+    checkIfWin();
+};
+
+const checkIfWin = function () {
+    if (word.toUpperCase() === wordInProgress.innerText) {
+        message.classList.add("win");   //adding the "win" class to the empty paragraph where messages appear when the guess the letter. Since the player has won here.
+        message.innerHTML = `<p class="highlight"> You guessed the correct word! Congrats!</p>`;    //updating the paragraphs content for congrats.
     }
 };
