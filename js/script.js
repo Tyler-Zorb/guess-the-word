@@ -9,7 +9,7 @@ const playAgainButton = document.querySelector(".play-again");
 
 let word = "magnolia"; //using just this 1 word to start until we add the list of 800.
 let remainingGuesses = 8;
-const guessedLetters = [];  //this array will contain the letters the player has guessed.
+let guessedLetters = [];  //this array will contain the letters the player has guessed.
 
 const getWord = async function () {
     const response = await fetch ("https://gist.githubusercontent.com/skillcrush-curriculum/7061f1d4d3d5bfe47efbfbcfe42bf57e/raw/5ffc447694486e7dea686f34a6c085ae371b43fe/words.txt");
@@ -23,7 +23,7 @@ const getWord = async function () {
 getWord();  //calling this in order to view the reulsts in the console.
 
 // Display our symbols as placeholders for the chosen word's letters.
-const placeholder = function () {
+const placeholder = function (word) {
     const placeholderLetters = [];
     for (const letter of word) {
        console.log(letter);
@@ -33,7 +33,7 @@ const placeholder = function () {
 };
 
 //placeholder(word); //calling the function and passing the var word as the argument. This makes it so 8 circle symbols are on the screen.(one for each letter of magnolia which is the single word we are starting with)
-//commented this out cuz it had me do the same above affter creating that fucntion so no longer needed here.
+//commented this out cuz it had me do the same above after creating that fucntion so no longer needed here.
 
 guessLetterButton.addEventListener("click", function (e) {
     e.preventDefault(); //this line prevents the page from reloading after the button is clicked. Since it's a ford and it's guessing more than once you don't want the page to keep reloading.
@@ -51,13 +51,13 @@ guessLetterButton.addEventListener("click", function (e) {
 
 //This function will validate the player's input
 const validateInput = function (input) {
-    const acceptedLetter = /[a-zA-Z]/   //This line they gave me. It uses a regular expression to ensure the player inputs a letter.
+    const acceptedLetter = /[a-zA-Z]/;   //This line they gave me. It uses a regular expression to ensure the player inputs a letter.
     if (input.length === 0) {  //This is checking if the input is empty.
-        message.innterText = "Please enter a letter.";
-    } else if (input > 1) {    //this is checking for more than one letter entered.
+        message.innerText = "Please enter a letter.";
+    } else if (input.length > 1) {    //this is checking for more than one letter entered.
         message.innerText = "Please only enter one letter.";
     } else if (!input.match(acceptedLetter)) { //This is checking for a number, character or something not a letter.
-        message.innerText = "Please enter a letter from A to Z."
+        message.innerText = "Please enter a letter from A to Z.";
     } else {
         return input;
     }
@@ -111,7 +111,8 @@ const updateGuessesRemaining = function (guess) {
     }
 
     if (remainingGuesses === 0) {
-        message.innerText = `Game over! The word was <span class="highlight">${word}</span>.`;
+        message.innerHTML = `Game over! The word was <span class="highlight">${word}</span>.`;
+        startOver();    //calling the startOver function so the game resets.
     } else if (remainingGuesses === 1) {
         remainingGuessesSpan.innerText = `${remainingGuesses} guess`;
     } else {
@@ -123,6 +124,31 @@ const checkIfWin = function () {
     if (word.toUpperCase() === wordInProgress.innerText) {
         message.classList.add("win");   //adding the "win" class to the empty paragraph where messages appear when the guess the letter. Since the player has won here.
         message.innerHTML = `<p class="highlight"> You guessed the correct word! Congrats!</p>`;    //updating the paragraphs content for congrats.
+
+        startOver();    //calling the start over function whether they win or lose so it will restart.
     }
 };
+
+const startOver = function () {
+    guessLetterButton.classList.add("hide");    //this is hiding the guess button.
+    remainingGuessesElement.classList.add("hide");  //this is hiding the paragraph where the remaining guesses will display.
+    guessedLettersElement.classList.add("hide");    //this is hiding the unordered list where the guessed letters appear.
+    playAgainButton.classList.remove("hide");   //this removes the hide on the play again button so it will show after the game is over.
+};
+
+playAgainButton.addEventListener("click", function() {
+    message.classList.remove("win");    //removing the class of "win" applied to the message element.
+    guessedLetters = []; //setting the guessedLetter var back to an empty array.
+    remainingGuesses = 8;   //setting the remaining guesses back to 8.    
+    remainingGuessesSpan.innerText = `${remainingGuesses} guesses`;         //populating the text of the span inside the paragraph where the remaining guesses display with the new amount of guesses.
+    guessedLettersElement.innerHTML = "";
+    message.innerText = "";
+
+    getWord();      //Grab a new word.
+
+    guessLetterButton.classList.remove("hide");         //showing the Guess button.
+    playAgainButton.classList.add("hide");
+    remainingGuessesElement.classList.remove("hide");
+    guessedLettersElement.classList.remove("hide");    
+});
 
